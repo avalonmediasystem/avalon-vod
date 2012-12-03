@@ -33,6 +33,7 @@ Adobe Media Server's `onConnect()` event handles operation (1), and can permit o
 * Tokens can be tied to user sessions/expirable, or generated on the fly and good forever (e.g., for embedding).
 * Tokens which abused can be revoked or expired.
 * The same `auth_token` can be used to secure multiple streams, but a given connection will only have access to the specific stream that generated the `stream_token`.
+* Translatable to HTTP auth via the `prg` directive in `mod_rewrite`.
 
 ## Cons ##
 
