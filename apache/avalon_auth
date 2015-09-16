@@ -1,18 +1,23 @@
 #!/bin/bash
 
-auth_url=`grep AVALON.AUTH_URL /opt/adobe/ams/conf/ams.ini | cut -d '=' -f 2 | sed 's/^ *//g'`
+if [ -z "$AUTH_URL" ]; then
+  AUTH_URL=`grep AVALON.AUTH_URL /opt/adobe/ams/conf/ams.ini | cut -d '=' -f 2 | sed 's/^ *//g'`
+fi
 
 while read uri; do
   saveIFS=$IFS
   IFS='=&'
   parm=($uri)
   IFS=$saveIFS
-  raw=`curl -s "${auth_url}.txt?token=${parm[1]}"`
-  resp="${raw//[[:space:]]/}"
-  valid=`echo ${parm[1]} | grep ^${resp}`
-  if [ -n "${valid}" ] && [ -n "${resp}" ]; then
-    echo $uri
-  else
-    echo '/avalon/forbidden'
-  fi
+  curl_cmd="curl -s ${AUTH_URL}.txt?token=${parm[1]}"
+  raw=`${curl_cmd}`
+  result='/avalon/forbidden'
+  for seg in $raw; do 
+    valid=`echo ${uri} | grep /${seg}`
+    if [ -n "${valid}" ] && [ -n "${seg}" ]; then
+      result=$uri
+      break
+    fi
+  done
+  echo $result
 done
